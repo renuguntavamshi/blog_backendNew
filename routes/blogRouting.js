@@ -1,39 +1,29 @@
 const express = require('express');
 const Blog = require('../models/blogModel');
 const blogRouting = express.Router();
-const { storage } = require('../cloudinary'); // path to cloudinary config
 let multer = require('multer');
 
 
-// const storage = multer.diskStorage({
-//   destination: function (req, file, cb) {
-//     cb(null, './public/uploads')
-//   },
-//   filename: function (req, file, cb) {
-//     cb(null, Date.now() + '-' + file.originalname)
-//   }
-// })
-
-const upload = multer({ storage })
-
-router.post('/blog', upload.single('image'), async (req, res) => {
-  try {
-    const { blogtitle, blog_category, description, publishedBy } = req.body;
-console.log(req.body,req.file)
-    const newBlog = new Blog({
-      blogtitle,
-      blog_category,
-      description,
-      publishedBy,
-      imageUrl: req.file.path // Cloudinary URL
-    });
-
-    await newBlog.save();
-    res.json(newBlog);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, './public/uploads')
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + '-' + file.originalname)
   }
-});
+})
+
+const upload = multer({ storage: storage })
+
+blogRouting.post("/blog",upload.single("image"),async (req,res)=>{
+let {filename,path}=req.file;
+let {blogtitle,description,publishedBy,blog_category}=req.body;
+console.log(req.file,req.body)
+    let newlyCreatedBlog=   new Blog({path,filename,blogtitle,description,publishedBy,blog_category});
+ let result= await newlyCreatedBlog.save()
+ console.log(result);
+ res.send(result)
+})
 
 blogRouting.get("/blog", async (req, res) => {
   try {

@@ -8,7 +8,7 @@ const router=express.Router()
 //Middlewares
 app.use(cors())
 app.use(express.json());
-app.use(express.static("public"));
+app.use('/uploads', express.static('public/uploads'));
 
 
 // Load all routes (just one line!)
